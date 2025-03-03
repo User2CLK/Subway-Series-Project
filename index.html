@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset=utf-8 />
+	<title>NYY-NYM Subway Series Transit Map</title>
+	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+	<link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
+
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			background: "whitesmoke";
+			font-family: "Noto Sans", sans-serif;
+			color: #3d3d3d;
+		}
+
+		h1 {
+			position: absolute;
+			margin-top: 0;
+			top: 10px;
+			left: 45px;
+			font-size: 2em;
+			font-family: "Lora", serif;
+			letter-spacing: .04em;
+			padding: 10px 15px;
+			background: rgba(256, 256, 256);
+			border: 1px solid grey;
+			border-radius: 3px;
+			z-index: 800;
+		}
+
+		h2 {
+			.scrolling-box {
+	  width: 100%; /* Adjust width as needed */
+	  height: 200px; /* Adjust height as needed */
+	  overflow: auto;
+	  border: 1px solid #ccc; /* Optional: Add a border for visual effect */
+	  padding: 10px; /* Optional: Add padding for better readability */
+	}
+		}
+
+		#map {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			width: 100%;
+		}
+
+		section {
+			position: absolute;
+			bottom: 0;
+			left: 10px;
+			width: 280px;
+			margin: 20px auto;
+			padding: 0 15px;
+			background: rgba(256, 256, 256);
+			border: 1px solid grey;
+			border-radius: 3px;
+			z-index: 800;
+		}
+
+		p {
+			font-size: .9em;
+			line-height: 1.5em;
+		}
+
+		a {
+			color: #005daa;
+			text-decoration: none;
+		}
+
+		a:hover {
+			text-decoration: underline;
+		}
+		</style>
+</head>
+
+  
+<body>
+
+	<h1>The Route Between Yankee Stadium, The Bronx, and Citi Field, Queens, via the MTA.</h1>
+
+	<div id='map'></div>
+
+	<section>
+		<h2>About this map:</h2>
+		<div class="scrolling-text">
+
+        <p>This map details the transit route of the journey between Yankee Stadium, in The Bronx, and Citi Field, in Queens via the MTA, or the Metro Transit Authority, New York City's widespread mass transit network. 
+            These stadiums host the modern-day series of baseball games in Major League Baseball colloquially known as the Subway Series played between the New York Yankees and the New York Mets.
+            This series of games is uniquely used to describe the crosstown rivalry between the Mets and the Yankees, as the series was formerly only possible during the World Series unitl 1997, when interleague regular season play was introduced between the American and National Leagues.
+            My interests in both baseball and public transit are what inspired me to make this map, as both stadiums are directly accessible by subway; Yankee Stadium from the 161st St-Yankee Stadium station and Citi Field via the Mets-Willets Point station.
+            This unique set of games that happen every season in baseball now illustrate the unique place this event has in America.
+            With baseball itself becoming so detached from the cities that teams have made their name in in the past ~130 years, and with America being renowned for its lack of accessible and useful transit outside of its oldest cities, it is comforting to see this event harken back to a time when better practices were in place for both facets of this project: when professional baseball was played in glorified parks hemmed in by apartment buildings and grandstands, and when mass transportation far exceeded the automobile as Americans' main way of getting around.
+            This trip only covers about 9 miles as the crow flies and usualy takes around 55 minutes via the subways, of which travelers must take a somewhat out-of-the-way route through most of Midtown Manhattan on three separate lines, as the stadiums are oriented on a NW-SE direction relative to each other while the MTA's lines are overwhemingly oriented N-S and E-W.
+			These games will take place multiple times this season, both at <a href="https://www.mlb.com/gameday/mets-vs-yankees/2025/05/16/777904/preview" target="_blank">Yankee Stadium, on May 16,</a> and <a href="https://www.mlb.com/gameday/yankees-vs-mets/2025/07/04/777250/preview" target="_blank">Citi Field, on July 4th.</a>
+            </p>
+		</p>
+		<p>Map authored by Charles Knowles</p>
+		</div>
+	</section>
+<!--style css code for the scrolling text box-->
+<style>
+.scrolling-text{
+	width: 100%;
+	height: 200px;
+	overflow: auto;
+	border: 1px solid #ccc;
+	padding: 5px;
+	background-color: #f9f9f9;
+}
+.scrolling-text::-webkit-scrollbar{
+	width: 8px;
+}
+.scrolling-text::-webkit-scrollbar-thumb{
+	background-color: darkgrey;
+	border-radius: 10px;
+}
+</style>
+
+	<script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+	<script src="Route between the stadiums.js"></script>
+
+	<script>
+	//Map initialization
+	var options = {
+		center: [45, -73.91713204638302],
+		zoom: 11
+	}
+	//creation of map object in Leaflet
+	var map = L.map('map', options);
+	//request to load basemap
+	var USGS_USTopo = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
+	maxZoom: 20,
+	attribution: 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>'
+	}).addTo(map);
+	function onEachFeature(feature, layer) {
+			if (feature.properties && feature.properties.name && feature.properties.desc) {
+				layer.bindPopup("<b>" + feature.properties.name + "</b><br>" + feature.properties.desc);
+			}
+		}
+	L.geoJson(data, {
+		onEachFeature: onEachFeature,
+		style: function(feature){
+			return{
+				color: feature.properties.lineColor ||'navy',
+				weight: 2,
+				opacity: 1
+			};
+		}
+	}).addTo(map);
+
+	
+	map.fitBounds(L.geoJson(data).getBounds());
+	</script>
+</body>
+</html>
